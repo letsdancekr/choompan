@@ -779,11 +779,18 @@ cpManual.addEventListener("mouseleave", () => {
   }
 });
 
+function loadPostcards() {
+    fetch("https://letsdancekr.github.io/choompan/allData.json", { mode: "cors" })
+        .then((response) => response.json())
+        .then((data) => {
+            // postcards 배열에 접근
+            const postcards = data.postcards;
 
-      function loadPostcards() {
-        fetch("https://letsdancekr.github.io/choompan/allData.json", { mode: "cors" })
-          .then((response) => response.json())
-          .then((postcards) => {
+            // postcards가 배열인지 확인
+            if (!Array.isArray(postcards)) {
+                throw new Error("Invalid data format: Expected an array");
+            }
+
             // 타임스탬프를 기준으로 내림차순 정렬 (최신순)
             postcards.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
@@ -791,19 +798,20 @@ cpManual.addEventListener("mouseleave", () => {
             let latestPostcards = postcards.slice(0, 5).map(p => p.id);
 
             postcards.forEach((postcard) => {
-              if (!loadedPostcards.includes(postcard.timestamp)) {
-                addPostcardToMap(postcard);
-                loadedPostcards.push(postcard.timestamp);
-              }
+                if (!loadedPostcards.includes(postcard.timestamp)) {
+                    addPostcardToMap(postcard);
+                    loadedPostcards.push(postcard.timestamp);
+                }
             });
 
             // 깜빡임 효과 업데이트
             updateMinimapBlinking(latestPostcards);
-          })
-          .catch((error) => {
-            console.log("Error loading postcards:", error);
-          });
-      }
+        })
+        .catch((error) => {
+            console.error("Error loading postcards:", error);
+        });
+}
+
 
 
       function addPostcardToMap(postcard) {
@@ -859,7 +867,7 @@ cpManual.addEventListener("mouseleave", () => {
 
       setInterval(() => {
         fetchNewPostcards();
-      }, 15000);
+      }, 9999999999999999);
 
       // 이벤트 리스너를 addPostcardToMap 함수 밖에서 한 번만 추가합니다.
 mapContainer.addEventListener("mousemove", (e) => {
